@@ -441,7 +441,7 @@
         // AUTHENTICATION
         // ============================================
         function signIn() {
-            const provider = new auth.GoogleAuthProvider();
+            const provider =  auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).then(()=>{alert('Well done'}).catch(error => {
                 console.error('Sign-in error:', error);
                 alert('Sign-in failed. Please try again.');
