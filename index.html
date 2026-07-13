@@ -441,8 +441,8 @@
         // AUTHENTICATION
         // ============================================
         function signIn() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch(error => {
+            const provider = new auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).then(()=>{alert('Well done'}).catch(error => {
                 console.error('Sign-in error:', error);
                 alert('Sign-in failed. Please try again.');
             });
