@@ -1,857 +1,540 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App with Friend Requests</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>ART HYPERX X</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            height: 100vh;
-            overflow: hidden;
-        }
+    body {
+      background: #E6E6E6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .app-container {
-            display: flex;
-            height: 100vh;
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
+    /* ----- HEADER ----- */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h2 {
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #111;
+    }
+    header button {
+      background: black;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    header button i {
+      font-size: 1rem;
+    }
+    header button:hover {
+      background: #333;
+    }
 
-        /* Sidebar */
-        .sidebar {
-            width: 300px;
-            background: #f8f9fa;
-            border-right: 1px solid #e0e0e0;
-            display: flex;
-            flex-direction: column;
-        }
+    /* ----- SIDEBAR (corrected & enhanced) ----- */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 280px;
+      height: 100vh;
+      background: rgba(10, 25, 47, 0.98);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      transition: left 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      box-shadow: 8px 0 32px rgba(0, 0, 0, 0.2);
+      padding: 2rem 1rem;
+      border-radius: 0 24px 24px 0;
+      display: flex;
+      flex-direction: column;
+      color: white;
+    }
 
-        .user-profile {
-            padding: 20px;
-            background: #1a73e8;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+    .sidebar.open {
+      left: 0;
+    }
 
-        .user-profile img {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
+    .close-sidebar {
+      position: absolute;
+      top: 1rem;
+      right: 1.2rem;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: 0.2s;
+    }
+    .close-sidebar:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
 
-        .user-info h3 {
-            font-size: 16px;
-            margin-bottom: 2px;
-        }
+    .sidebar-item {
+      background: rgba(255, 255, 255, 0.08);
+      margin: 1rem 0;
+      padding: 1rem 1.2rem;
+      border-radius: 60px;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      word-break: break-word;
+    }
 
-        .user-info p {
-            font-size: 12px;
-            opacity: 0.9;
-        }
+    .sidebar-item i {
+      font-size: 1.2rem;
+      width: 28px;
+      text-align: center;
+    }
 
-        .nav-tabs {
-            display: flex;
-            background: white;
-            border-bottom: 1px solid #e0e0e0;
-        }
+    .sidebar-item:hover {
+      background: #FF6B4A;
+      transform: translateX(8px);
+      border-color: transparent;
+    }
 
-        .nav-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
-        }
+    /* profile image inside sidebar */
+    #profilePhoto {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 0.5rem;
+      border: 2px solid rgba(255,255,255,0.5);
+      background: #2a2a4a;
+    }
 
-        .nav-tab.active {
-            color: #1a73e8;
-            border-bottom-color: #1a73e8;
-        }
+    .google-signin-btn {
+      background: white;
+      color: #111;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 40px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 1rem 0 1.2rem;
+      cursor: pointer;
+      transition: 0.2s;
+      width: 100%;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+    }
+    .google-signin-btn:hover {
+      background: #f0f0f0;
+    }
 
-        .search-section {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-            display: none;
-        }
+    /* overlay */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.25s;
+    }
+    .overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
 
-        .search-section.show {
-            display: block;
-        }
+    /* ----- MAIN CONTENT ----- */
+    .home {
+      background: #FFFFFF;
+      padding: 24px;
+      margin: 16px 12px;
+      border-radius: 28px;
+      max-width: 700px;
+      width: calc(100% - 24px);
+      align-self: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
 
-        .search-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            font-size: 14px;
-            outline: none;
-        }
+    .home u h2 {
+      font-weight: 700;
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+    }
+    hr {
+      margin: 18px 0 14px;
+      border: 0.5px solid #ddd;
+    }
 
-        .search-input:focus {
-            border-color: #1a73e8;
-        }
+    .home p {
+      font-weight: 600;
+      margin: 14px 0 6px;
+      color: #222;
+    }
 
-        .chat-list, .friend-list, .request-list {
-            flex: 1;
-            overflow-y: auto;
-        }
+    input[type="file"] {
+      padding: 10px;
+      border: 2px dashed #000000;
+      border-radius: 14px;
+      width: 100%;
+      background: #fafafa;
+      cursor: pointer;
+    }
+    input::-webkit-file-upload-button {
+      background: black;
+      padding: 10px 18px;
+      color: white;
+      font-weight: 700;
+      border-radius: 30px;
+      border: none;
+      margin-right: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    input::-webkit-file-upload-button:hover {
+      background: #333;
+    }
 
-        .list-item {
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-            transition: background 0.2s;
-        }
+    textarea {
+      width: 100%;
+      padding: 14px;
+      border: 2px dashed #aaa;
+      border-radius: 18px;
+      font-size: 0.95rem;
+      resize: vertical;
+      background: #fdfdfd;
+      margin-top: 6px;
+    }
 
-        .list-item:hover {
-            background: #f0f0f0;
-        }
+    #feed {
+      background: #f8f8f8;
+      border-radius: 20px;
+      padding: 12px;
+      min-height: 100px;
+      margin-top: 8px;
+      color: #444;
+      font-style: italic;
+    }
 
-        .list-item.selected {
-            background: #e8f0fe;
-        }
+    button:active {
+      transform: scale(0.96);
+    }
 
-        .list-item img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-
-        .list-item-info {
-            flex: 1;
-        }
-
-        .list-item-info h4 {
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 2px;
-        }
-
-        .list-item-info p {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 6px;
-        }
-
-        .btn-accept, .btn-reject, .btn-add {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .btn-accept {
-            background: #1a73e8;
-            color: white;
-        }
-
-        .btn-reject {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-add {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-accept:hover, .btn-reject:hover, .btn-add:hover {
-            opacity: 0.9;
-        }
-
-        .badge {
-            background: #dc3545;
-            color: white;
-            border-radius: 10px;
-            padding: 2px 6px;
-            font-size: 11px;
-            margin-left: 6px;
-        }
-
-        /* Chat Area */
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-header {
-            padding: 16px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .chat-header img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-
-        .chat-header h3 {
-            font-size: 16px;
-            color: #333;
-        }
-
-        .messages-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #e8ebed;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .message {
-            max-width: 60%;
-            padding: 10px 14px;
-            border-radius: 18px;
-            font-size: 14px;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-
-        .message.sent {
-            background: #1a73e8;
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.received {
-            background: white;
-            color: #333;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-
-        .message .time {
-            font-size: 10px;
-            opacity: 0.7;
-            margin-top: 4px;
-        }
-
-        .message-input-container {
-            padding: 16px;
-            background: #f8f9fa;
-            border-top: 1px solid #e0e0e0;
-            display: flex;
-            gap: 12px;
-        }
-
-        .message-input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 24px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .message-input:focus {
-            border-color: #1a73e8;
-        }
-
-        .send-btn {
-            padding: 12px 24px;
-            background: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 24px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .send-btn:hover {
-            background: #1557b0;
-        }
-
-        .welcome-screen {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: #999;
-            font-size: 18px;
-        }
-
-        .welcome-screen i {
-            font-size: 64px;
-            margin-bottom: 20px;
-            color: #1a73e8;
-        }
-
-        .signout-btn {
-            margin-top: auto;
-            padding: 12px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.2s;
-        }
-
-        .signout-btn:hover {
-            background: #c82333;
-        }
-
-        @media (max-width: 768px) {
-            .app-container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 100%;
-                height: 50%;
-            }
-            
-            .chat-area {
-                height: 50%;
-            }
-        }
-    </style>
+    /* responsive touch */
+    @media (max-width: 480px) {
+      .home {
+        margin: 10px 6px;
+        padding: 18px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="login-screen" style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5;">
-        <div style="background: white; padding: 40px; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <h1 style="margin-bottom: 8px; color: #1a73e8;">💬 Chat App</h1>
-            <p style="margin-bottom: 24px; color: #666;">Connect with friends</p>
-            <button onclick="signIn()" style="padding: 12px 32px; background: #1a73e8; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">
-                Sign in with Google
-            </button>
-        </div>
+  <header>
+    <h2>ARTYX</h2>
+    <button id="menuToggleBtn"><i class="fas fa-bars"></i> menu</button>
+  </header>
+
+  <!-- CORRECTED SIDEBAR (class renamed to sidebar, fixed structure) -->
+  <aside class="sidebar" id="sidePanel">
+    <button class="close-sidebar" id="closeSidebarBtn"><i class="fas fa-times"></i></button>
+    
+    <button id="googleSignBtn" class="google-signin-btn">
+      <i class="fab fa-google"></i> Sign In With Google
+    </button>
+    
+    <img id="profilePhoto" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="profile avatar" style="display:block; margin:0 auto 0.2rem; width:70px; height:70px; border-radius:50%; object-fit:cover; background:#ccc;" />
+    
+    <div id="displayName" class="sidebar-item">
+      <i class="fas fa-user-circle"></i> <span id="nameText">Guest</span>
     </div>
-
-    <!-- Main App -->
-    <div id="app-screen" style="display: none;">
-        <div class="app-container">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="user-profile" id="current-user-profile">
-                    <img id="current-user-avatar" src="" alt="">
-                    <div class="user-info">
-                        <h3 id="current-user-name"></h3>
-                        <p id="current-user-email"></p>
-                    </div>
-                </div>
-
-                <div class="nav-tabs">
-                    <div class="nav-tab active" onclick="switchTab('chats')">Chats</div>
-                    <div class="nav-tab" onclick="switchTab('friends')">Friends</div>
-                    <div class="nav-tab" onclick="switchTab('requests')">
-                        Requests <span class="badge" id="request-count" style="display: none;">0</span>
-                    </div>
-                </div>
-
-                <div class="search-section show" id="search-section">
-                    <input type="text" class="search-input" id="search-input" placeholder="Search users by email..." onkeyup="searchUsers()">
-                </div>
-
-                <div class="chat-list" id="chat-list"></div>
-                <div class="friend-list" id="friend-list" style="display: none;"></div>
-                <div class="request-list" id="request-list" style="display: none;"></div>
-
-                <button class="signout-btn" onclick="signOut()">Sign Out</button>
-            </div>
-
-            <!-- Chat Area -->
-            <div class="chat-area">
-                <div class="chat-header" id="chat-header" style="display: none;">
-                    <img id="chat-partner-avatar" src="" alt="">
-                    <h3 id="chat-partner-name"></h3>
-                </div>
-                <div class="messages-container" id="messages-container">
-                    <div class="welcome-screen">
-                        <div>💬</div>
-                        <p>Select a chat to start messaging</p>
-                    </div>
-                </div>
-                <div class="message-input-container" id="message-input-container" style="display: none;">
-                    <input type="text" class="message-input" id="message-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
-                    <button class="send-btn" onclick="sendMessage()">Send</button>
-                </div>
-            </div>
-        </div>
+    <div id="displayEmail" class="sidebar-item">
+      <i class="fas fa-envelope"></i> <span id="emailText">not signed in</span>
     </div>
+    <div style="flex:1;"></div>
+    <div class="sidebar-item" style="margin-top:auto; opacity:0.7;">
+      <i class="fas fa-palette"></i> Art HyperX
+    </div>
+  </aside>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <div class="overlay" id="overlay"></div>
 
-    <script>
-        // ============================================
-        // FIREBASE CONFIGURATION - REPLACE WITH YOUR OWN
-        // ============================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyA-OyDUzcmweGczSVqkDssXEblGF7YG4Ys",
+  <br />
+  <div class="home">
+    <u><h2>Home & Uploads</h2></u>
+    <hr />
+    <p>📷 Upload Image</p>
+    <input type="file" id="filesUpload" accept="image/*">
+    <p>✍️ Caption</p>
+    <textarea id="caption" rows="5" cols="40" placeholder="Your description..."></textarea>
+    <hr />
+    <h3>🌿 Feeds</h3>
+    <div id="feed">
+      <i class="fas fa-image"></i> Your art gallery appears here...
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    (function() {
+      // ----- SIDEBAR TOGGLE LOGIC (corrected functionality) -----
+      const sidebar = document.getElementById('sidePanel');
+      const overlay = document.getElementById('overlay');
+      const menuBtn = document.getElementById('menuToggleBtn');
+      const closeBtn = document.getElementById('closeSidebarBtn');
+
+      function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+      }
+
+      if (menuBtn) {
+        menuBtn.addEventListener('click', openSidebar);
+      }
+      if (closeBtn) {
+        closeBtn.addEventListener('click', closeSidebar);
+      }
+      if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+      }
+
+      // ----- FIREBASE CONFIG (placeholder – replace with your own config) -----
+      const firebaseConfig = {
+           apiKey: "AIzaSyA-OyDUzcmweGczSVqkDssXEblGF7YG4Ys",
   authDomain: "ian-tech.firebaseapp.com",
   projectId: "ian-tech",
   storageBucket: "ian-tech.firebasestorage.app",
   messagingSenderId: "103669714993",
   appId: "1:103669714993:web:14f6c97d5555993addc510",
   measurementId: "G-RL880V5HQ4"
-        };
+      };
 
-        // Initialize Firebase
+      // Initialize Firebase (safe check)
+      try {
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        console.log("Firebase initialized (demo mode). Replace config for real usage.");
+      } catch (e) {
+        console.warn("Firebase init error or already initialized:", e.message);
+      }
 
-        let currentUser = null;
-        let currentChat = null;
-        let currentTab = 'chats';
-        let friends = [];
-        let unsubscribeMessages = null;
+      const auth = firebase.auth();
+      const db = firebase.firestore();
 
-        // ============================================
-        // AUTHENTICATION
-        // ============================================
-        function signIn() {
-            const provider =  auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).then(()=>{alert('Well done'}).catch(error => {
-                console.error('Sign-in error:', error);
-                alert('Sign-in failed. Please try again.');
-            });
+      // ----- UI ELEMENTS for auth -----
+      const googleSignBtn = document.getElementById('googleSignBtn');
+      const profilePhoto = document.getElementById('profilePhoto');
+      const nameText = document.getElementById('nameText');
+      const emailText = document.getElementById('emailText');
+      const feedDiv = document.getElementById('feed');
+
+      // Default avatar
+      const defaultAvatar = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+
+      // Update sidebar UI with user data
+      function updateUserUI(user) {
+        if (user) {
+          const displayName = user.displayName || 'Artist';
+          const email = user.email || 'no email';
+          const photoURL = user.photoURL || defaultAvatar;
+          
+          if (nameText) nameText.textContent = displayName;
+          if (emailText) emailText.textContent = email;
+          if (profilePhoto) {
+            profilePhoto.src = photoURL;
+            profilePhoto.alt = displayName;
+          }
+          // change button text
+          if (googleSignBtn) {
+            googleSignBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Sign Out';
+          }
+        } else {
+          if (nameText) nameText.textContent = 'Guest';
+          if (emailText) emailText.textContent = 'not signed in';
+          if (profilePhoto) profilePhoto.src = defaultAvatar;
+          if (googleSignBtn) {
+            googleSignBtn.innerHTML = '<i class="fab fa-google"></i> Sign In With Google';
+          }
+        }
+      }
+
+      // Google Sign-In / Sign-Out handler
+      async function handleGoogleAuth() {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          // Sign out
+          try {
+            await auth.signOut();
+            updateUserUI(null);
+            if (feedDiv) feedDiv.innerHTML = '<i class="fas fa-info-circle"></i> Signed out. Sign in to see feeds.';
+          } catch (err) {
+            alert('Sign out error: ' + err.message);
+          }
+          return;
         }
 
-        function signOut() {
-            auth.signOut();
+        // Sign in with Google
+        const provider = new firebase.auth.GoogleAuthProvider();
+        try {
+          const result = await auth.signInWithPopup(provider);
+          updateUserUI(result.user);
+          if (feedDiv) feedDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Loading art feeds...';
+          // Optionally load some demo feeds from Firestore
+          loadFeeds();
+        } catch (error) {
+          console.error("Google sign-in error:", error);
+          alert("Sign-in failed: " + (error.message || "Please check pop-up blocker or config."));
+          // Fallback: still show guest UI
         }
+      }
 
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-screen').style.display = 'block';
-                
-                document.getElementById('current-user-avatar').src = user.photoURL;
-                document.getElementById('current-user-name').textContent = user.displayName;
-                document.getElementById('current-user-email').textContent = user.email;
-                
-                await createUserProfile(user);
-                await loadFriends();
-                await loadChats();
-                await loadFriendRequests();
-            } else {
-                currentUser = null;
-                document.getElementById('login-screen').style.display = 'flex';
-                document.getElementById('app-screen').style.display = 'none';
-                
-                if (unsubscribeMessages) {
-                    unsubscribeMessages();
-                    unsubscribeMessages = null;
-                }
-            }
+      if (googleSignBtn) {
+        googleSignBtn.addEventListener('click', handleGoogleAuth);
+      }
+
+      // Auth state listener
+      auth.onAuthStateChanged((user) => {
+        updateUserUI(user);
+        if (user) {
+          console.log("User signed in:", user.email);
+          loadFeeds();
+        } else {
+          if (feedDiv) feedDiv.innerHTML = '<i class="fas fa-lock"></i> Sign in to explore art feeds.';
+        }
+      });
+
+      // Simple feed loader (demo / Firestore)
+      async function loadFeeds() {
+        if (!feedDiv) return;
+        try {
+          // Try to get recent uploads from Firestore (collection 'posts')
+          const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').limit(8).get();
+          if (snapshot.empty) {
+            feedDiv.innerHTML = '<i class="far fa-image"></i> No art yet. Be the first to upload!';
+            return;
+          }
+          let html = '';
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const caption = data.caption || 'Untitled';
+            const imageUrl = data.imageUrl || '';
+            html += `
+              <div style="background:white; border-radius:16px; padding:12px; margin-bottom:12px; display:flex; gap:12px; align-items:center;">
+                <div style="width:60px; height:60px; background:#ddd; border-radius:12px; overflow:hidden; flex-shrink:0;">
+                  ${imageUrl ? `<img src="${imageUrl}" style="width:100%; height:100%; object-fit:cover;" alt="art"/>` : '<i class="fas fa-image" style="padding:18px;"></i>'}
+                </div>
+                <div><strong>${escapeHtml(caption)}</strong><br><small style="color:#666;">by ${escapeHtml(data.userName || 'artist')}</small></div>
+              </div>`;
+          });
+          feedDiv.innerHTML = html;
+        } catch (err) {
+          console.warn("Feed load error (maybe missing permissions):", err.message);
+          feedDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Demo mode: connect Firestore to see real art.';
+        }
+      }
+
+      function escapeHtml(text) {
+        return String(text).replace(/[&<>"]/g, function(m) {
+          if (m === '&') return '&amp;';
+          if (m === '<') return '&lt;';
+          if (m === '>') return '&gt;';
+          if (m === '"') return '&quot;';
+          return m;
         });
+      }
 
-        async function createUserProfile(user) {
-            const userRef = db.collection('users').doc(user.uid);
-            const doc = await userRef.get();
-            if (!doc.exists) {
-                await userRef.set({
-                    uid: user.uid,
-                    name: user.displayName,
-                    email: user.email,
-                    photoURL: user.photoURL,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    friends: []
-                });
-            }
-        }
+      // Upload demonstration (mock / real upload to Firestore)
+      const fileInput = document.getElementById('filesUpload');
+      const captionInput = document.getElementById('caption');
 
-        // ============================================
-        // FRIENDS MANAGEMENT
-        // ============================================
-        async function loadFriends() {
-            const userRef = db.collection('users').doc(currentUser.uid);
-            const doc = await userRef.get();
-            friends = doc.data()?.friends || [];
-            displayFriends();
-        }
+      if (fileInput) {
+        fileInput.addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          
+          const user = auth.currentUser;
+          if (!user) {
+            alert('Please sign in with Google to upload art.');
+            fileInput.value = ''; 
+            return;
+          }
 
-        async function searchUsers() {
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            if (!searchTerm || searchTerm.length < 3) {
-                displayFriends();
-                return;
-            }
-
-            const snapshot = await db.collection('users')
-                .where('email', '>=', searchTerm)
-                .where('email', '<=', searchTerm + '\uf8ff')
-                .limit(10)
-                .get();
-
-            const searchResults = [];
-            snapshot.forEach(doc => {
-                if (doc.id !== currentUser.uid) {
-                    searchResults.push(doc.data());
-                }
+          // In a real app, upload to Cloud Storage and save to Firestore.
+          // Here we simulate a demo post.
+          const caption = captionInput?.value.trim() || 'Untitled Art';
+          const dummyImageUrl = 'https://placehold.co/200x200/FF6B4A/white?text=Art+Upload';
+          
+          try {
+            await db.collection('posts').add({
+              userId: user.uid,
+              userName: user.displayName || 'Artist',
+              caption: caption,
+              imageUrl: dummyImageUrl, // replace with real uploaded URL
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
-
-            displaySearchResults(searchResults);
-        }
-
-        function displaySearchResults(users) {
-            const friendList = document.getElementById('friend-list');
-            friendList.innerHTML = '';
-            friendList.style.display = 'block';
-            document.getElementById('chat-list').style.display = 'none';
-            document.getElementById('request-list').style.display = 'none';
-
-            if (users.length === 0) {
-                friendList.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">No users found</div>';
-                return;
-            }
-
-            users.forEach(user => {
-                const isFriend = friends.includes(user.uid);
-                const hasPendingRequest = checkPendingRequest(user.uid);
-                
-                const div = document.createElement('div');
-                div.className = 'list-item';
-                div.innerHTML = `
-                    <img src="${user.photoURL || 'https://via.placeholder.com/40'}" alt="">
-                    <div class="list-item-info">
-                        <h4>${user.name}</h4>
-                        <p>${user.email}</p>
-                    </div>
-                    <div class="action-buttons">
-                        ${isFriend ? 
-                            '<span style="color: #28a745; font-size: 12px;">✓ Friends</span>' :
-                            hasPendingRequest ?
-                            '<span style="color: #ffc107; font-size: 12px;">Pending</span>' :
-                            `<button class="btn-add" onclick="sendFriendRequest('${user.uid}')">Add Friend</button>`
-                        }
-                    </div>
-                `;
-                friendList.appendChild(div);
-            });
-        }
-
-        function displayFriends() {
-            const friendList = document.getElementById('friend-list');
-            friendList.innerHTML = '';
-            friendList.style.display = currentTab === 'friends' ? 'block' : 'none';
-
-            if (friends.length === 0) {
-                friendList.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">No friends yet</div>';
-                return;
-            }
-
-            friends.forEach(async (friendId) => {
-                const friendDoc = await db.collection('users').doc(friendId).get();
-                const friend = friendDoc.data();
-                if (friend) {
-                    const div = document.createElement('div');
-                    div.className = 'list-item';
-                    div.onclick = () => openChat(friendId);
-                    div.innerHTML = `
-                        <img src="${friend.photoURL || 'https://via.placeholder.com/40'}" alt="">
-                        <div class="list-item-info">
-                            <h4>${friend.name}</h4>
-                            <p>${friend.email}</p>
-                        </div>
-                    `;
-                    friendList.appendChild(div);
-                }
-            });
-        }
-
-        async function sendFriendRequest(toUserId) {
-            try {
-                // Check if request already exists
-                const existingRequests = await db.collection('friendRequests')
-                    .where('from', '==', currentUser.uid)
-                    .where('to', '==', toUserId)
-                    .where('status', '==', 'pending')
-                    .get();
-
-                if (!existingRequests.empty) {
-                    alert('Friend request already sent!');
-                    return;
-                }
-
-                await db.collection('friendRequests').add({
-                    from: currentUser.uid,
-                    to: toUserId,
-                    fromName: currentUser.displayName,
-                    fromEmail: currentUser.email,
-                    fromPhoto: currentUser.photoURL,
-                    status: 'pending',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                alert('Friend request sent!');
-                await searchUsers();
-            } catch (error) {
-                console.error('Error sending friend request:', error);
-                alert('Failed to send friend request');
-            }
-        }
-
-        function checkPendingRequest(toUserId) {
-            // This is checked asynchronously, simplified for demo
-            return false;
-        }
-
-        async function loadFriendRequests() {
-            const requestList = document.getElementById('request-list');
-            const requestCount = document.getElementById('request-count');
-
-            // Listen for incoming requests
-            db.collection('friendRequests')
-                .where('to', '==', currentUser.uid)
-                .where('status', '==', 'pending')
-                .onSnapshot(snapshot => {
-                    requestList.innerHTML = '';
-                    const requests = [];
-                    snapshot.forEach(doc => {
-                        requests.push({ id: doc.id, ...doc.data() });
-                    });
-
-                    // Update badge
-                    if (requests.length > 0) {
-                        requestCount.style.display = 'inline';
-                        requestCount.textContent = requests.length;
-                    } else {
-                        requestCount.style.display = 'none';
-                    }
-
-                    if (requests.length === 0) {
-                        requestList.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">No pending requests</div>';
-                        return;
-                    }
-
-                    requests.forEach(request => {
-                        const div = document.createElement('div');
-                        div.className = 'list-item';
-                        div.innerHTML = `
-                            <img src="${request.fromPhoto || 'https://via.placeholder.com/40'}" alt="">
-                            <div class="list-item-info">
-                                <h4>${request.fromName}</h4>
-                                <p>${request.fromEmail}</p>
-                            </div>
-                            <div class="action-buttons">
-                                <button class="btn-accept" onclick="acceptRequest('${request.id}', '${request.from}')">Accept</button>
-                                <button class="btn-reject" onclick="rejectRequest('${request.id}')">Reject</button>
-                            </div>
-                        `;
-                        requestList.appendChild(div);
-                    });
-                });
-        }
-
-        async function acceptRequest(requestId, fromUserId) {
-            try {
-                // Update request status
-                await db.collection('friendRequests').doc(requestId).update({
-                    status: 'accepted'
-                });
-
-                // Add to current user's friends
-                await db.collection('users').doc(currentUser.uid).update({
-                    friends: firebase.firestore.FieldValue.arrayUnion(fromUserId)
-                });
-
-                // Add current user to sender's friends
-                await db.collection('users').doc(fromUserId).update({
-                    friends: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
-                });
-
-                await loadFriends();
-            } catch (error) {
-                console.error('Error accepting request:', error);
-                alert('Failed to accept request');
-            }
-        }
-
-        async function rejectRequest(requestId) {
-            try {
-                await db.collection('friendRequests').doc(requestId).update({
-                    status: 'rejected'
-                });
-            } catch (error) {
-                console.error('Error rejecting request:', error);
-                alert('Failed to reject request');
-            }
-        }
-
-        // ============================================
-        // CHAT FUNCTIONALITY
-        // ============================================
-        async function loadChats() {
-            const chatList = document.getElementById('chat-list');
-            chatList.innerHTML = '';
-
-            if (friends.length === 0) {
-                chatList.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">Add friends to start chatting</div>';
-                return;
-            }
-
-            friends.forEach(async (friendId) => {
-                const friendDoc = await db.collection('users').doc(friendId).get();
-                const friend = friendDoc.data();
-                if (friend) {
-                    const div = document.createElement('div');
-                    div.className = 'list-item';
-                    div.onclick = () => openChat(friendId);
-                    div.innerHTML = `
-                        <img src="${friend.photoURL || 'https://via.placeholder.com/40'}" alt="">
-                        <div class="list-item-info">
-                            <h4>${friend.name}</h4>
-                            <p>Click to chat</p>
-                        </div>
-                    `;
-                    chatList.appendChild(div);
-                }
-            });
-        }
-
-        async function openChat(friendId) {
-            currentChat = friendId;
             
-            // Get friend info
-            const friendDoc = await db.collection('users').doc(friendId).get();
-            const friend = friendDoc.data();
-            
-            document.getElementById('chat-partner-avatar').src = friend.photoURL;
-            document.getElementById('chat-partner-name').textContent = friend.name;
-            document.getElementById('chat-header').style.display = 'flex';
-            document.getElementById('message-input-container').style.display = 'flex';
-            document.getElementById('messages-container').innerHTML = '';
+            if (feedDiv) feedDiv.innerHTML = '<i class="fas fa-check-circle"></i> Art shared! Refreshing...';
+            if (captionInput) captionInput.value = '';
+            fileInput.value = '';
+            setTimeout(() => loadFeeds(), 800);
+          } catch (err) {
+            alert('Upload failed: ' + err.message);
+            console.error(err);
+          }
+        });
+      }
 
-            // Unsubscribe from previous listener
-            if (unsubscribeMessages) {
-                unsubscribeMessages();
-            }
-
-            // Listen for messages
-            const chatId = getChatId(currentUser.uid, friendId);
-            unsubscribeMessages = db.collection('chats')
-                .doc(chatId)
-                .collection('messages')
-                .orderBy('timestamp', 'asc')
-                .onSnapshot(snapshot => {
-                    document.getElementById('messages-container').innerHTML = '';
-                    snapshot.forEach(doc => {
-                        const message = doc.data();
-                        displayMessage(message);
-                    });
-                    scrollToBottom();
-                });
+      // initial feed load if user already signed in
+      setTimeout(() => {
+        if (auth.currentUser) {
+          loadFeeds();
         }
-
-        function getChatId(userId1, userId2) {
-            return userId1 < userId2 ? `${userId1}_${userId2}` : `${userId2}_${userId1}`;
-        }
-
-        async function sendMessage() {
-            const messageInput = document.getElementById('message-input');
-            const messageText = messageInput.value.trim();
-            
-            if (!messageText || !currentChat) return;
-
-            const chatId = getChatId(currentUser.uid, currentChat);
-            
-            try {
-                await db.collection('chats')
-                    .doc(chatId)
-                    .collection('messages')
-                    .add({
-                        text: messageText,
-                        senderId: currentUser.uid,
-                        senderName: currentUser.displayName,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                messageInput.value = '';
-            } catch (error) {
-                console.error('Error sending message:', error);
-                alert('Failed to send message');
-            }
-        }
-
-        function displayMessage(message) {
-            const messagesContainer = document.getElementById('messages-container');
-            const div = document.createElement('div');
-            div.className = `message ${message.senderId === currentUser.uid ? 'sent' : 'received'}`;
-            
-            const time = message.timestamp ? 
-                new Date(message.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 
-                '';
-            
-            div.innerHTML = `
-                ${message.text}
-                <div class="time">${time}</div>
-            `;
-            
-            messagesContainer.appendChild(div);
-        }
-
-        function scrollToBottom() {
-            const container = document.getElementById('messages-container');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        // ============================================
-        // UI FUNCTIONS
-        // ============================================
-        function switchTab(tab) {
-            currentTab = tab;
-            
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.getElementById('chat-list').style.display = tab === 'chats' ? 'block' : 'none';
-            document.getElementById('friend-list').style.display = tab === 'friends' ? 'block' : 'none';
-            document.getElementById('request-list').style.display = tab === 'requests' ? 'block' : 'none';
-            document.getElementById('search-section').classList.toggle('show', tab === 'friends');
-            
-            if (tab === 'friends') {
-                displayFriends();
-            }
-        }
-    </script>
+      }, 400);
+    })();
+  </script>
 </body>
 </html>
